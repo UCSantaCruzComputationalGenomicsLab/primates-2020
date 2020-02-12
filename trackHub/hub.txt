@@ -1,0 +1,6 @@
+hub primates_eichler
+shortLabel primates_eichler
+longLabel primates_eichler
+genomesFile genomes.txt
+email NoEmail
+

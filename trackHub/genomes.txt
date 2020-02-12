@@ -1,0 +1,81 @@
+genome Gibbon
+twoBitPath Gibbon/Gibbon.2bit
+trackDb Gibbon/trackDb.txt
+organism Gibbon
+description Gibbon
+scientificName Gibbon
+defaultPos chr2:1-200000
+groups groups.txt
+
+genome Rhesus
+twoBitPath Rhesus/Rhesus.2bit
+trackDb Rhesus/trackDb.txt
+organism Rhesus
+description Rhesus
+scientificName Rhesus
+defaultPos chr1:1-200000
+groups groups.txt
+
+genome Chimp
+twoBitPath Chimp/Chimp.2bit
+trackDb Chimp/trackDb.txt
+organism Chimp
+description Chimp
+scientificName Chimp
+defaultPos chr1:1-200000
+groups groups.txt
+
+genome Marmoset
+twoBitPath Marmoset/Marmoset.2bit
+trackDb Marmoset/trackDb.txt
+organism Marmoset
+description Marmoset
+scientificName Marmoset
+defaultPos chr1:1-200000
+groups groups.txt
+
+genome Gorilla
+twoBitPath Gorilla/Gorilla.2bit
+trackDb Gorilla/trackDb.txt
+organism Gorilla
+description Gorilla
+scientificName Gorilla
+defaultPos chr1:1-200000
+groups groups.txt
+
+genome Orangutan
+twoBitPath Orangutan/Orangutan.2bit
+trackDb Orangutan/trackDb.txt
+organism Orangutan
+description Orangutan
+scientificName Orangutan
+defaultPos 1:1-200000
+groups groups.txt
+
+genome Human
+twoBitPath Human/Human.2bit
+trackDb Human/trackDb.txt
+organism Human
+description Human
+scientificName Human
+defaultPos chr1:1-200000
+groups groups.txt
+
+genome Owl_monkey
+twoBitPath Owl_monkey/Owl_monkey.2bit
+trackDb Owl_monkey/trackDb.txt
+organism Owl_monkey
+description Owl_monkey
+scientificName Owl_monkey
+defaultPos 000000F_43050948_qpd:1-200000
+groups groups.txt
+
+genome Bonobo
+twoBitPath Bonobo/Bonobo.2bit
+trackDb Bonobo/trackDb.txt
+organism Bonobo
+description Bonobo
+scientificName Bonobo
+defaultPos chr1:1-200000
+groups groups.txt
+
