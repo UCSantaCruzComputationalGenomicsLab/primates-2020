@@ -1,26 +1,24 @@
-* Assemblies:
-|   |   |   |   |
-|--:|--:|--:|--:|
-|   |   |   |   |
-|   |   |   |   |
-|   |   |   |   |
 
-| common     | name                          | accession       | type | UCSC |
-| Marmoset   | Callithrix_jacchus_cj1700_1.0 | GCA_009663435.1 |      |      |
-| Chimpanzee | Clint_PTRv2                   | GCF_002880755.1 |      |      |
-| Orangutan  | Susie_PABv2                   | GCF_002880775.1 |      |      |
-|            | Mmul_10                       | GCF_003339765.1 |      |      |
-|            | Asia_NLE_v1                   | GCF_006542625.1 |      |      |
-|            | Kamilah_GGO_v0                | GCF_008122165.1 |      |      |
+# Genome assemblies
+
+| HAL name   | scientific              | submitter name                | accession       | type | UCSC     |   |
+|:-----------|:------------------------|:------------------------------|:----------------|:-----|:---------|---|
+| Marmoset   | Callithrix jacchus      | Callithrix_jacchus_cj1700_1.0 | GCA_009663435.1 | GB   | -        |   |
+| Chimp      | Pan troglodytes         | Clint_PTRv2                   | GCF_002880755.1 | RS   | panTro6  |   |
+| Orangutan  | Pongo abelii            | Susie_PABv2                   | GCF_002880775.1 | RS   | ponAbe3  |   |
+| Rhesus     | Macaca mulatta          | Mmul_10                       | GCF_003339765.1 | RS   | rheMac10 |   |
+| Gibbon     | Nomascus leucogenys     | Asia_NLE_v1                   | GCF_006542625.1 | RS   | -        |   |
+| Gorilla    | Gorilla gorilla gorilla | Kamilah_GGO_v0                | GCF_008122165.1 | RS   | -        |   |
+| Bonobo     | Pan paniscus            | Mhudiblu_PPA_v0               |                 | UN   | -        |   |
+| Owl_monkey | Aotus ???               | owl_monkey_indel_corrected    |                 | UN   | -        |   |
+| Human      | Homo sapiens            | GRCh38                        |                 | RS   | hg38     |   |
+| Mouse      | Mus musculus            | GRCm38                        |                 | RS   | mm10     |   |
+
+type: GB = GenBank, RS = RefSeq, UN = unsubmitted
 
 
-| owl_monkey
-Mhudiblu_PPA_v0_chromosomes_and_unplaced.fasta
-GRCh38
-mm10
-
-GCF == refeq
-
-* Location of various stuff:
+# Location of various stuff:
   * Ian's cactus and CAT work: /public/groups/cgl/cat/primates_evan/
   * Ian's hub: /public/groups/cgl/cat/primates_evan/out/assemblyHub
+  * URL of Ian's hub:  http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/assemblyHub/hub.txt
+
