@@ -24,5 +24,9 @@ Drawing of [phylogenetic tree](cactus.icytree.png)
 # Location of various stuff:
   * Ian's cactus and CAT work: /public/groups/cgl/cat/primates_evan/
   * Ian's hub: /public/groups/cgl/cat/primates_evan/out/assemblyHub
+  * HAL:  /public/groups/cgl/cat/primates_evan/primates_eichler.hal 
   * URL of Ian's hub:  http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/assemblyHub/hub.txt
-
+  * analysis shared directory:
+    * /public/groups/cgl/projs/primates-2020
+    
+  * analysis hub: http://courtyard.gi.ucsc.edu/~markd/primates-2020/analysisHub/hub.txt
