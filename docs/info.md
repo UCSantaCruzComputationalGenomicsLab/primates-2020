@@ -30,3 +30,4 @@ Drawing of [phylogenetic tree](cactus.icytree.png)
     * /public/groups/cgl/projs/primates-2020
     
   * analysis hub: http://courtyard.gi.ucsc.edu/~markd/primates-2020/analysisHub/hub.txt
+  * dN/dS data: /public/groups/cgl/cat/primates_evan/dn_ds.csv
