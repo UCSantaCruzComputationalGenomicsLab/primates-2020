@@ -1,0 +1,29 @@
+================================================================================
+2020-03-18 markd Rhesus synteny track
+
+  cd analysis/synteny/tmp
+
+  # do alignments with Rhesus as query
+  fgrep -v Rhesus ../../../data/leaf-genomes.lst >targets.lst
+  ../../../bin/halStats --bedSequences Rhesus ../../../data/primates_eichler.hal > Rhesus-seqs.bed
+  cut -f 1 Rhesus-seqs.bed >Rhesus.seqs
+
+  desired command is:
+    ../../../bin/halSynteny --minBlockSize 25000 --targetGenome ${TARGET} --queryGenome Rhesus --queryChromosome ${CHROM}  ../../../data/primates_eichler.hal out/${TARGET}.${CHROM}.psl
+  which is executed by runSynteny
+
+  
+  create syn.tmpl:
+    #LOOP
+    ../../../primates-2020/bin/runSynteny Rhesus $(path2) $(path1) {check out exists out/$(path1).$(path2).psl}
+    #ENDLOOP
+  gensub2 targets.lst Rhesus.seqs syn.tmpl syn.jobs
+  # run with -ram=16g
+  para create -batch=b1 syn.jobs -ram=16g
+
+  # build bigPsls
+  for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn.psl &) ; done
+  for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
+
+  for f in *.bigPslInput ; do (bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../../data/Rhesus.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
+ 

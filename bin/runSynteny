@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+if [ $# != 4 ] ; then
+    echo "wrong # args: query queryChrom target outPsl " >&2
+    exit 1
+fi
+query=$1
+queryChrom=$2
+target=$3
+outPsl=$4
+
+tmpOutPsl=${outPsl}.$(hostname).$$.tmp
+mkdir -p $(dirname ${outPsl})
+
+../../../bin/halSynteny --minBlockSize 25000 --targetGenome ${target} --queryGenome ${query} --queryChromosome ${queryChrom} ../../../data/primates_eichler.hal ${tmpOutPsl}
+mv -f ${tmpOutPsl} ${outPsl}
