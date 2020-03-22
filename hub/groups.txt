@@ -13,3 +13,8 @@ label Expression
 priority 3
 defaultIsClosed 0
 
+name analysis
+label Analysis
+priority 4
+defaultIsClosed 0
+
