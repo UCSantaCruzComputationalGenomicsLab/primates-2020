@@ -11,7 +11,7 @@ shortLabel Bonobo Synteny
 longLabel Bonobo Synteny (25KB resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Bonobo-Rhesus.syn.bigPsl
 
 track ChimpSynteny
@@ -20,7 +20,7 @@ shortLabel Chimp Synteny
 longLabel Chimp Synteny (25KB Resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Chimp-Rhesus.syn.bigPsl
 
 track GibbonSynteny
@@ -29,7 +29,7 @@ shortLabel Gibbon Synteny
 longLabel Gibbon Synteny (25KB Resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Gibbon-Rhesus.syn.bigPsl
 
 track GorillaSynteny
@@ -38,7 +38,7 @@ shortLabel Gorilla Synteny
 longLabel Gorilla Synteny (25KB Resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Gorilla-Rhesus.syn.bigPsl
 
 track HumanSynteny
@@ -47,7 +47,7 @@ shortLabel Human Synteny
 longLabel Human Synteny (25KB Resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Human-Rhesus.syn.bigPsl
 
 track MarmosetSynteny
@@ -56,7 +56,7 @@ shortLabel Marmoset Synteny
 longLabel Marmoset Synteny (25KB Resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Marmoset-Rhesus.syn.bigPsl
 
 track OrangutanSynteny
@@ -65,7 +65,7 @@ shortLabel Orangutan Synteny
 longLabel Orangutan Synteny (25KB Resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Orangutan-Rhesus.syn.bigPsl
 
 track Owl_monkeySynteny
@@ -74,6 +74,6 @@ shortLabel Owl_monkey Synteny
 longLabel Owl_monkey Synteny (25KB resolution)
 type bigPsl
 color 0,90,100
-visibility dense
+visibility pack
 bigDataUrl Owl_monkey-Rhesus.syn.bigPsl
 
