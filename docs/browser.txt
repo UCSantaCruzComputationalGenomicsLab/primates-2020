@@ -1,5 +1,5 @@
 ================================================================================
-2020-03-18 markd Rhesus synteny track
+2020-03-18 markd Rhesus synteny track 25kb, 1mb, and 25mb resolutions
 
   cd analysis/synteny/tmp
 
@@ -9,9 +9,8 @@
   cut -f 1 Rhesus-seqs.bed >Rhesus.seqs
 
   desired command is:
-    ../../../bin/halSynteny --minBlockSize 25000 --targetGenome ${TARGET} --queryGenome Rhesus --queryChromosome ${CHROM}  ../../../data/primates_eichler.hal out/${TARGET}.${CHROM}.psl
+    ../../../bin/halSynteny --minBlockSize 25000 --maxAnchorDistance 25000 --targetGenome ${TARGET} --queryGenome Rhesus --queryChromosome ${CHROM}  ../../../data/primates_eichler.hal out/${TARGET}.${CHROM}.psl
   which is executed by runSynteny
-
   
   create syn.tmpl:
     #LOOP
@@ -19,11 +18,27 @@
     #ENDLOOP
   gensub2 targets.lst Rhesus.seqs syn.tmpl syn.jobs
   # run with -ram=16g
-  para create -batch=b1 syn.jobs -ram=16g
+  para create -batch=b1 syn.jobs -ram=16g  -maxQueue=100000000
 
   # build bigPsls
-  for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn.psl &) ; done
+  for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn25kb.psl &) ; done
   for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
-
   for f in *.bigPslInput ; do (bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../../data/Rhesus.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
  
+ ### for 1mb resolution
+ as above with:
+    ../../../primates-2020/bin/runSynteny1mb Rhesus $(path2) $(path1) {check out exists out/$(path1).$(path2).psl}
+
+  # need to increase stack since in bedToBigBed do to very large PSLs
+  for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn1mb.psl &) ; done
+  for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
+  for f in *.bigPslInput ; do (ulimit -s 20000; bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../../data/Rhesus.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
+
+### for 25mb resolution
+ as above with:
+    ../../../primates-2020/bin/runSynteny25mb Rhesus $(path2) $(path1) {check out exists out/$(path1).$(path2).psl}
+
+  # need to increase stack since in bedToBigBed do to very large PSLs
+  for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn25mb.psl &) ; done
+  for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
+  for f in *.bigPslInput ; do (ulimit -s 20000; bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../../data/Rhesus.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
