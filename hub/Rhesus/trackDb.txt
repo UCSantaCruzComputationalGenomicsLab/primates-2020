@@ -7,7 +7,9 @@ include transmap.txt
 include augustus_cgp.txt
 include evaluation.txt
 include augustus_pb.txt
-include synteny.txt
+include synteny25mb.txt
+include synteny1mb.txt
+include synteny25kb.txt
 
 
 track hubCentral
