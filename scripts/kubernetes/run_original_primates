@@ -1,0 +1,120 @@
+(kubectl delete job ifiddes-run-cat || true) && kubectl apply -f - <<'EOF'
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ifiddes-run-cat
+spec:
+  ttlSecondsAfterFinished: 345600
+  template:
+    spec:
+      containers:
+      - name: main
+        imagePullPolicy: Always
+        image: ubuntu:18.04
+        command:
+        - /bin/bash
+        - -c
+        - |
+          #set -ex
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq -y
+          apt-get install -qq -y build-essential libssl-dev libncurses5-dev libcurl4-openssl-dev liblzma-dev libbz2-dev libboost-all-dev sqlite3 libsqlite3-0 libsqlite3-dev libgsl0-dev lp-solve liblpsolve55-dev libbamtools-dev wget git bedtools bamtools samtools sqlite3 python-pip libgsl0-dev libcolamd2 awscli
+
+          aws s3 ls s3://primates-cactus-eichler/
+
+          echo "nameserver 1.1.1.1" >/etc/resolv.conf
+
+          # htslib
+          git clone git://github.com/samtools/htslib.git && cd htslib && make install && cd /
+
+          # bcftools
+          git clone git://github.com/samtools/bcftools.git && cd bcftools && make && cd /
+
+          # samtools
+          git clone git://github.com/samtools/samtools && cd samtools && make && make install && cd /
+
+          # HDF5
+          wget -q http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz
+          tar xzf hdf5-1.10.1.tar.gz
+          cd hdf5-1.10.1 && ./configure --enable-cxx --prefix=/usr && make && make install && cd /
+
+          # sonLib
+          git clone git://github.com/benedictpaten/sonLib.git
+          cd sonLib && make && cd /
+
+          # HAL
+          git clone git://github.com/glennhickey/hal.git
+          cd /hal && git checkout 531758b3 && make && cd /
+
+          # LibBigWig
+          git clone https://github.com/dpryan79/libBigWig.git
+          cd libBigWig && make install && cd /
+
+          # WiggleTools
+          git clone https://github.com/Ensembl/WiggleTools.git
+          # Their makefile now hardcodes /bin/cc as compiler :(
+          ln -s /usr/bin/cc /bin/cc
+          cd WiggleTools && make && cd /
+
+          # sambamba
+          wget -q https://github.com/biod/sambamba/releases/download/v0.6.7/sambamba_v0.6.7_linux.tar.bz2
+          tar xvjf sambamba_v0.6.7_linux.tar.bz2
+
+          for i in wigToBigWig faToTwoBit gff3ToGenePred genePredToBed genePredToFakePsl bamToPsl transMapPslToGenePred pslPosTarget axtChain chainMergeSort pslMap pslRecalcMatch pslMapPostChain gtfToGenePred genePredToGtf pslCheck pslCDnaFilter clusterGenes pslToBigPsl bedSort bedToBigBed ; do wget -q http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/$i -O /bin/$i ; chmod +x /bin/$i ; done
+          wget -q http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/blat -O /bin/blat ; chmod +x /bin/blat
+
+          mv /hal/bin/* /bin/
+          mv /sambamba /bin/
+          mv /augustus/bin/* /bin/
+          mv /augustus/scripts/* /bin/
+          mv /WiggleTools/bin/* /bin/
+
+          cd /
+          git clone https://github.com/ComparativeGenomicsToolkit/Comparative-Annotation-Toolkit.git
+          cd Comparative-Annotation-Toolkit
+          pip install virtualenv
+          virtualenv cat_env
+          source cat_env/bin/activate
+          pip install bd2k-python-lib
+          pip install -e .
+          pip uninstall -y toil
+          pip install toil==3.16
+
+          sed -i 's/ = 5/ = 1/' luigi.cfg
+
+          #mkdir data && cd data && aws s3 cp --quiet --recursive s3://primates-cactus-eichler/data . && cd ..
+          mkdir data && cd data && wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/original_primates/assemblyHub/original_primates.hal && wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/gencode.v33.annotation.gff3.noPAR && cd ..
+
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/cat_original_primates.config
+
+          #aws s3 cp --recursive s3://primates-cactus-eichler/cat .
+
+          luigi --module cat RunCat --hal=data/original_primates.hal --target-genomes='("Chimp", "Gibbon", "Gorilla", "Orangutan", "Rhesus")' --ref-genome=Human --workers=10 --config=cat_original_primates.config --work-dir work --out-dir out --local-scheduler --assembly-hub --maxCores 45 --binary-mode local
+          aws s3 cp --recursive out/ s3://primates-cactus-eichler/cat_original_primates/out
+          aws s3 cp --recursive --exclude '*toil*' work/ s3://primates-cactus-eichler/cat_original_primates/work
+          sleep 10000000000
+        volumeMounts:
+        - mountPath: /tmp
+          name: scratch-volume
+        - mountPath: /root/.aws
+          name: s3-credentials
+          readOnly: true
+        resources:
+          requests:
+            cpu: 45
+            memory: "200Gi"
+            ephemeral-storage: "600Gi"
+          limits:
+            cpu: 45
+            memory: "300Gi"
+            ephemeral-storage: "1200Gi"
+      restartPolicy: Never
+      volumes:
+      - name: scratch-volume
+        emptyDir: {}
+      - name: s3-credentials
+        secret:
+          secretName: shared-s3-credentials
+  backoffLimit: 0
+EOF
+

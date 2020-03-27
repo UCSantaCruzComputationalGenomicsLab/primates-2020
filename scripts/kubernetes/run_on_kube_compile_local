@@ -1,0 +1,76 @@
+(kubectl delete job ifiddes-run-cactus || true) && kubectl apply -f - <<'EOF'
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ifiddes-run-cactus
+spec:
+  ttlSecondsAfterFinished: 345600
+  template:
+    spec:
+      containers:
+      - name: main
+        imagePullPolicy: Always
+        image: ubuntu:16.04
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -ex
+          DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y awscli wget git gcc g++ build-essential python-dev zlib1g-dev kyototycoon libkyototycoon-dev libkyotocabinet-dev valgrind libbz2-dev libhiredis-dev pkg-config python-pip
+          cd /tmp
+          echo "nameserver 1.1.1.1" >/etc/resolv.conf
+
+          export kyotoTycoonIncl="-I/usr/include -DHAVE_KYOTO_TYCOON=1"
+          export kyotoTycoonLib="-L/usr/lib -Wl,-rpath,/usr/lib -lkyototycoon -lkyotocabinet -lz -lbz2 -lpthread -lm -lstdc++"
+
+          git clone https://github.com/ComparativeGenomicsToolkit/cactus.git
+          cd cactus
+          pip install virtualenv
+          virtualenv cactus_env
+          source cactus_env/bin/activate
+          pip install --upgrade toil
+          pip install --upgrade .
+          git submodule update --init
+          make
+
+          export PATH=$PWD/bin:$PATH
+
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/cactus.config.local
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/GCF_008122165.1_Kamilah_GGO_v0_fixed.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/GCF_003339765.1_Mmul_10_fixed.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/GCF_006542625.1_Asia_NLE_v1_fixed.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/GCA_009663435.1_Callithrix_jacchus_cj1700_1.0_fixed.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/GCF_002880755.1_Clint_PTRv2_fixed.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/GCF_002880775.1_Susie_PABv2_fixed.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/GRCh38.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/mm10.fa
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/Mhudiblu_PPA_v0_chromosomes_and_unplaced.fasta
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/owl_monkey_indel_corrected.fa
+          cactus jobStore cactus.config output.hal --maxCores 93 --binariesMode local
+
+          aws s3 cp output.hal s3://primates-cactus-eichler/output.hal
+          sleep 10000000000
+        volumeMounts:
+        - mountPath: /tmp
+          name: scratch-volume
+        - mountPath: /root/.aws
+          name: s3-credentials
+          readOnly: true
+        resources:
+          requests:
+            cpu: 93
+            memory: "200Gi"
+            ephemeral-storage: "300Gi"
+          limits:
+            cpu: 93
+            memory: "350Gi"
+            ephemeral-storage: "400Gi"
+      restartPolicy: Never
+      volumes:
+      - name: scratch-volume
+        emptyDir: {}
+      - name: s3-credentials
+        secret:
+          secretName: shared-s3-credentials
+  backoffLimit: 0
+EOF

@@ -1,0 +1,64 @@
+(kubectl delete job ifiddes-run-cactus || true) && kubectl apply -f - <<'EOF'
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ifiddes-run-cactus
+spec:
+  ttlSecondsAfterFinished: 345600
+  template:
+    spec:
+      containers:
+      - name: main
+        imagePullPolicy: Always
+        image: ubuntu:16.04
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -ex
+          DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y awscli wget git gcc g++ build-essential python-dev zlib1g-dev libkyototycoon-dev libtokyocabinet-dev libkyotocabinet-dev valgrind libbz2-dev libhiredis-dev pkg-config python-pip
+          cd /tmp
+          echo "nameserver 1.1.1.1" >/etc/resolv.conf
+
+          wget -O - http://neuro.debian.net/lists/xenial.us-ca.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
+          apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
+          apt-get update -qq -y
+          apt-get install -qq -y docker singularity
+
+          pip install toil==3.16 networkx==2.2 pytest
+
+          git clone https://github.com/ComparativeGenomicsToolkit/cactus.git
+          cd cactus
+          pip install .
+
+          export PATH=$PWD/bin:$PATH
+
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/cactus.config
+          cactus jobStore cactus.config output.hal --maxCores 93 --binariesMode singularity
+
+          aws s3 cp output.hal s3://primates-cactus-eichler/output.hal
+          sleep 10000000000
+        volumeMounts:
+        - mountPath: /tmp
+          name: scratch-volume
+        - mountPath: /root/.aws
+          name: s3-credentials
+          readOnly: true
+        resources:
+          requests:
+            cpu: 2
+            memory: "20Gi"
+            ephemeral-storage: "20Gi"
+          limits:
+            cpu: 2
+            memory: "20Gi"
+            ephemeral-storage: "20Gi"
+      restartPolicy: Never
+      volumes:
+      - name: scratch-volume
+        emptyDir: {}
+      - name: s3-credentials
+        secret:
+          secretName: shared-s3-credentials
+  backoffLimit: 0
+EOF

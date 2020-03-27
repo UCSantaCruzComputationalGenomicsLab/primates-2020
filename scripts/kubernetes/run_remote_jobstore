@@ -1,0 +1,80 @@
+(kubectl delete job ifiddes-run-cactus || true) && kubectl apply -f - <<'EOF'
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ifiddes-run-cactus
+spec:
+  ttlSecondsAfterFinished: 345600
+  template:
+    spec:
+      containers:
+      - name: main
+        imagePullPolicy: Always
+        image: ubuntu:16.04
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -ex
+          DEBIAN_FRONTEND=noninteractive apt-get update -qq -y && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y awscli build-essential checkinstall g++ gcc git kyototycoon libbz2-dev libc6-dev libffi-dev libgdbm-dev libhiredis-dev libkyotocabinet-dev libkyototycoon-dev libncursesw5-dev libreadline-gplv2-dev libsqlite3-dev libssl-dev openssl pkg-config python3-dev python3-setuptools tk-dev valgrind wget zlib1g-dev libhdf5-dev
+
+          # Pull down Python 3.7, build, and install
+          mkdir /tmp/Python37
+          cd /tmp/Python37
+          wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz
+          tar xvf Python-3.7.0.tar.xz
+          cd /tmp/Python37/Python-3.7.0
+          ./configure
+          make altinstall -j 20
+          ln -s /usr/local/bin/python3.7 /usr/local/bin/python
+          ln -s /usr/local/bin/pip3.7 /usr/local/bin/pip
+
+          cd /tmp
+          echo "nameserver 1.1.1.1" >/etc/resolv.conf
+          export kyotoTycoonIncl="-I/usr/include -DHAVE_KYOTO_TYCOON=1"
+          export kyotoTycoonLib="-L/usr/lib -Wl,-rpath,/usr/lib -lkyototycoon -lkyotocabinet -lz -lbz2 -lpthread -lm -lstdc++"
+
+          git clone https://github.com/ComparativeGenomicsToolkit/cactus.git
+          cd cactus
+          git submodule update --init --recursive
+
+          pip install virtualenv
+          virtualenv cactus_env
+          source cactus_env/bin/activate
+
+          pip install toil boto boto3
+          pip install .
+          make -j 20
+          export PATH=$PWD/bin:$PATH
+          wget https://raw.githubusercontent.com/DataBiosphere/toil/46cb3a6c65c0be48b83c116cafcbb0b70bf7feec/src/toil/__init__.py
+          echo "customDockerInitCmd = lambda x: x" >> __init__.py
+          mv __init__.py cactus_env/lib/python3.7/site-packages/toil/__init__.py
+          wget http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/assemblies/cactus_v2.config
+          #toil clean aws:us-west-2:primateseichler-jobstore
+          cactus aws:us-west-2:primateseichler-jobstore cactus_v2.config output.hal --maxCores 93 --binariesMode local --intermediateResultsUrl s3://primates-cactus-eichler/intermediates/primates_eichler_v2
+          aws s3 cp output.hal s3://primates-cactus-eichler/primates_eichler-v2.hal
+          sleep 10000000000
+        volumeMounts:
+        - mountPath: /tmp
+          name: scratch-volume
+        - mountPath: /root/.aws
+          name: s3-credentials
+          readOnly: true
+        resources:
+          requests:
+            cpu: 90
+            memory: "250Gi"
+            ephemeral-storage: "300Gi"
+          limits:
+            cpu: 90
+            memory: "300Gi"
+            ephemeral-storage: "400Gi"
+      restartPolicy: Never
+      volumes:
+      - name: scratch-volume
+        emptyDir: {}
+      - name: s3-credentials
+        secret:
+          secretName: shared-s3-credentials
+  backoffLimit: 0
+EOF
