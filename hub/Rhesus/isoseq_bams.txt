@@ -25,7 +25,7 @@ pairEndsByName on
     parent bams_Rhesus
     bigDataUrl 1_macaque1_merged_flnc.sorted.bam
     shortLabel Testes
-    longLabel macaque1 (SRR11365504)
+    longLabel Testes (SRR11365504)
     type bam
     priority 10
 
