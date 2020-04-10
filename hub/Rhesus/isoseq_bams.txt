@@ -16,48 +16,48 @@ pairEndsByName on
     track 0_macaque2_merged_flnc.sorted.bam_Rhesus
     parent bams_Rhesus
     bigDataUrl 0_macaque2_merged_flnc.sorted.bam
-    shortLabel macaque2
-    longLabel macaque2
+    shortLabel Anterior Insula
+    longLabel Anterior Insula (SRR11365505)
     type bam
     priority 10
 
     track 1_macaque1_merged_flnc.sorted.bam_Rhesus
     parent bams_Rhesus
     bigDataUrl 1_macaque1_merged_flnc.sorted.bam
-    shortLabel macaque1
-    longLabel macaque1
+    shortLabel Testes
+    longLabel macaque1 (SRR11365504)
     type bam
     priority 10
 
     track 2_rhesus0_merged_flnc.bam.sorted.bam_Rhesus
     parent bams_Rhesus
     bigDataUrl 2_rhesus0_merged_flnc.bam.sorted.bam
-    shortLabel rhesus0
-    longLabel rhesus0
+    shortLabel E80 somatosensory cortex
+    longLabel E80 somatosensory cortex
     type bam
     priority 10
 
     track 3_rhesus1_merged_flnc.bam.sorted.bam_Rhesus
     parent bams_Rhesus
     bigDataUrl 3_rhesus1_merged_flnc.bam.sorted.bam
-    shortLabel rhesus1
-    longLabel rhesus1
+    shortLabel E100 parietal lobe
+    longLabel E100 parietal lobe
     type bam
     priority 10
 
     track 4_rhesus2_merged_flnc.bam.sorted.bam_Rhesus
     parent bams_Rhesus
     bigDataUrl 4_rhesus2_merged_flnc.bam.sorted.bam
-    shortLabel rhesus2
-    longLabel rhesus2
+    shortLabel E100 anterior cerebellum
+    longLabel E100 anterior cerebellum
     type bam
     priority 10
 
     track 5_rhesus3_merged_flnc.bam.sorted.bam_Rhesus
     parent bams_Rhesus
     bigDataUrl 5_rhesus3_merged_flnc.bam.sorted.bam
-    shortLabel rhesus3
-    longLabel rhesus3
+    shortLabel iPS
+    longLabel iPS
     type bam
     priority 10
 
