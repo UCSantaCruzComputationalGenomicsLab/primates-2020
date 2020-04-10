@@ -34,10 +34,11 @@
   for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
   for f in *.bigPslInput ; do (ulimit -s 20000; bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../../data/Rhesus.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
 
-### for 25mb resolution
+### for 25mb resolution, 1mb anchor
  as above with:
     ../../../primates-2020/bin/runSynteny25mb Rhesus $(path2) $(path1) {check out exists out/$(path1).$(path2).psl}
 
+ use 1mb max anchor distance
   # need to increase stack since in bedToBigBed do to very large PSLs
   for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn25mb.psl &) ; done
   for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
