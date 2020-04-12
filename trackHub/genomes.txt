@@ -1,0 +1,7 @@
+genome rheMac10
+trackDb rheMac10/trackDb.txt
+organism Rhesus
+description Rhesus
+scientificName Rhesus
+defaultPos chr1:1-200000
+groups groups.txt
