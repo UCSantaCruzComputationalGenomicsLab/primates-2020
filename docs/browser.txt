@@ -43,3 +43,12 @@
   for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn25mb.psl &) ; done
   for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
   for f in *.bigPslInput ; do (ulimit -s 20000; bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../../data/Rhesus.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
+================================================================================
+# 2020-04-19 markd browser directory of filter novel exon set
+
+~markd/public_html/primates-2020/rhemac2-novel
+
+bedToHtmlDir -browser-url http://genome.ucsc.edu -title 'High-confidence unique Rhesus exons' -hub http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/trackHub/hub.txt rheMac10 notebooks/rhesus_filtered_novel_exons.bed ~/public_html/primates-2020/rhemac2-novel
+
+http://courtyard.gi.ucsc.edu/~markd/primates-2020/rhemac2-novel/
+================================================================================
