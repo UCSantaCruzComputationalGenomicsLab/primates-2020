@@ -1,0 +1,7 @@
+hub rhemac_tracks
+shortLabel Rhesus tracks
+longLabel Rhesus rheMac10 tracks
+genomesFile genomes.txt
+descriptionUrl primate_tracks_description.html
+email @contact@
+

@@ -1,0 +1,7 @@
+hub primate_assemblies
+shortLabel Primate assemblies
+longLabel Primate long read assemblies
+genomesFile genomes.txt
+descriptionUrl primate_assemblies_description.html
+email @contact@
+

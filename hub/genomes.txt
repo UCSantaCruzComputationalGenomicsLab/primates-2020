@@ -1,12 +1,3 @@
-genome Gibbon
-twoBitPath Gibbon/Gibbon.2bit
-trackDb Gibbon/trackDb.txt
-organism Gibbon
-description Gibbon
-scientificName Gibbon
-defaultPos chr2:1-200000
-groups groups.txt
-
 genome Rhesus
 twoBitPath Rhesus/Rhesus.2bit
 trackDb Rhesus/trackDb.txt
@@ -14,6 +5,15 @@ organism Rhesus
 description Rhesus
 scientificName Rhesus
 defaultPos chr1:1-200000
+groups groups.txt
+
+genome Gibbon
+twoBitPath Gibbon/Gibbon.2bit
+trackDb Gibbon/trackDb.txt
+organism Gibbon
+description Gibbon
+scientificName Gibbon
+defaultPos chr2:1-200000
 groups groups.txt
 
 genome Chimp
