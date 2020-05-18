@@ -1,0 +1,79 @@
+track synteny25kb
+shortLabel Synteny 25KB
+longLabel Synteny 25KB resolution
+superTrack on show
+visibility hide
+group analysis
+
+track RhesusSynteny25kb
+parent synteny25kb
+shortLabel Rhesus Synteny 25KB
+longLabel Rhesus Synteny 25KB resolution
+type bigPsl
+color 0,20,180
+visibility pack
+bigDataUrl synteny/Rhesus-Bonobo.syn25kb.bigPsl
+
+track ChimpSynteny25kb
+parent synteny25kb
+shortLabel Chimp Synteny 25KB
+longLabel Chimp Synteny 25KB Resolution
+type bigPsl
+color 0,40,160
+visibility hide
+bigDataUrl synteny/Chimp-Bonobo.syn25kb.bigPsl
+
+track GibbonSynteny25kb
+parent synteny25kb
+shortLabel Gibbon Synteny 25KB
+longLabel Gibbon Synteny 25KB Resolution
+type bigPsl
+color 0,60,140
+visibility hide
+bigDataUrl synteny/Gibbon-Bonobo.syn25kb.bigPsl
+
+track GorillaSynteny25kb
+parent synteny25kb
+shortLabel Gorilla Synteny 25KB
+longLabel Gorilla Synteny 25KB Resolution
+type bigPsl
+color 0,80,120
+visibility hide
+bigDataUrl synteny/Gorilla-Bonobo.syn25kb.bigPsl
+
+track HumanSynteny25kb
+parent synteny25kb
+shortLabel Human Synteny 25KB
+longLabel Human Synteny 25KB Resolution
+type bigPsl
+color 0,100,100
+visibility hide
+bigDataUrl synteny/Human-Bonobo.syn25kb.bigPsl
+
+track MarmosetSynteny25kb
+parent synteny25kb
+shortLabel Marmoset Synteny 25KB
+longLabel Marmoset Synteny 25KB Resolution
+type bigPsl
+color 0,120,80
+visibility hide
+bigDataUrl synteny/Marmoset-Bonobo.syn25kb.bigPsl
+
+track OrangutanSynteny25kb
+parent synteny25kb
+shortLabel Orangutan Synteny 25KB
+longLabel Orangutan Synteny 25KB Resolution
+type bigPsl
+color 0,140,60
+visibility hide
+bigDataUrl synteny/Orangutan-Bonobo.syn25kb.bigPsl
+
+track Owl_monkeySynteny25kb
+parent synteny25kb
+shortLabel Owl monkey Synteny 25KB
+longLabel Owl monkey Synteny 25KB resolution
+type bigPsl
+color 0,160,40
+visibility hide
+bigDataUrl synteny/Owl_monkey-Bonobo.syn25kb.bigPsl
+
