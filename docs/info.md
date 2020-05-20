@@ -3,7 +3,7 @@
 
 | HAL name   | scientific              | submitter name                | accession       | type | UCSC     | rseq | iseq |
 |:-----------|:------------------------|:------------------------------|:----------------|:-----|:---------|-----:|-----:|
-| Bonobo     | Pan paniscus            | Mhudiblu_PPA_v0               |                 | UN   | -        |    0 |    4 |
+| Bonobo     | Pan paniscus            | Mhudiblu_PPA_v0               | GCA_013052645.1 | GB   | -        |    0 |    4 |
 | Chimp      | Pan troglodytes         | Clint_PTRv2                   | GCF_002880755.1 | RS   | panTro6  |    1 |    1 |
 | Gibbon     | Nomascus leucogenys     | Asia_NLE_v1                   | GCF_006542625.1 | RS   | -        |    4 |    2 |
 | Gorilla    | Gorilla gorilla gorilla | Kamilah_GGO_v0                | GCF_008122165.1 | RS   | -        |    1 |    1 |
