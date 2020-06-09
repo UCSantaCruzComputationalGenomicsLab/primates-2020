@@ -1,0 +1,20 @@
+#!/bin/bash -e
+source ${HOME}/.bashenvrc
+
+chrom=$1
+start=$2
+end=$3
+destOrg=$4
+outPsl=$5
+
+export PATH=/hive/users/markd/compartiveGenomics/projs/hal/src/hal/bin:${PATH}
+
+tmpBed=$(mktemp)
+tmpOutPsl=${outPsl}.$(hostname).$$.tmp
+
+echo -e "${chrom}\t${start}\t${end}" >$tmpBed
+
+halLiftover --outPSL --noDupes ../../data/primates_eichler.hal \
+            Bonobo ${tmpBed} ${destOrg} ${tmpOutPsl}
+rm -f $tmpBed
+mv $tmpOutPsl $outPsl

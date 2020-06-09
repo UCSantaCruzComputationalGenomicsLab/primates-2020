@@ -1,0 +1,19 @@
+#!/bin/bash -ex
+set -beEu -o pipefail
+
+target=$1
+qGenome=../../data/genomes/Bonobo.2bit
+tGenome=../../data/genomes/$target.2bit 
+
+mkdir -p chained
+outChain=chained/Bonobo-$target.chain.gz
+outChainTmp=$outChain.$$.tmp
+
+pslPosTarget raw/Bonobo-$target.raw.psl stdout | \
+    axtChain -psl -verbose=0 \
+         -matrix=/scratch/data/blastz/human_chimp.v2.q -minScore=5000 -linearGap=medium \
+         stdin $tGenome $qGenome stdout | \
+    chainAntiRepeat  $tGenome $qGenome stdin stdout | \
+    gzip -c >$outChainTmp
+
+mv -f $outChainTmp $outChain

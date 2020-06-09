@@ -86,3 +86,13 @@ http://courtyard.gi.ucsc.edu/~markd/primates-2020/rhemac2-novel/
   # check
   for f in *.bigPsl ; do bigBedInfo $f >/dev/null ; done
 ================================================================================
+2020-06-08: liftover chains from HAL for bonobo
+   Bonobo to o
+   halStats --bedSequences Bonobo ../../data/primates_eichler.mmhal >Bonobo.seqs.bed0
+   for g in $(cat genomes.lst ) ; do awk -v g=$g '{print "./doHalLiftOver", $1,$2,$3,g, "tmp/"g"."$1".psl"}' Bonobo.seqs.bed ; done >tmp/jobs.para
+
+   for g in $(cat genomes.lst ) ; do (cat tmp/$g.* > raw/Bonobo-$g.raw.psl&) ; done
+   for g in $(cat genomes.lst ) ; do (nice ./doChain $g >&$g.log&) ;done
+   for g in $(cat genomes.lst ) ; do (nice chainSwap chained/Bonobo-$g.chain.gz  chained/$g-Bonobo.chain&) ;done
+
+================================================================================
