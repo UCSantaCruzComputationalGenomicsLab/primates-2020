@@ -1,20 +1,29 @@
 #!/bin/bash -e
 source ${HOME}/.bashenvrc
 
-chrom=$1
-start=$2
-end=$3
-destOrg=$4
-outPsl=$5
+if [ $# != 6 ] ; then
+    echo "wrong # args" >&2
+    exit 1
+fi
 
-export PATH=/hive/users/markd/compartiveGenomics/projs/hal/src/hal/bin:${PATH}
+srcOrg=$1
+chrom=$2
+start=$3
+end=$4
+destOrg=$5
+outPsl=$6
+
+export PATH=/hive/users/markd/compartiveGenomics/projs/hal/src/hal-opt/bin:${PATH}
+hal=/hive/users/markd/compartiveGenomics/projs/primates-2020/data/primates_eichler-v2.hal
 
 tmpBed=$(mktemp)
 tmpOutPsl=${outPsl}.$(hostname).$$.tmp
 
+mkdir -p $(dirname $outPsl)
+
 echo -e "${chrom}\t${start}\t${end}" >$tmpBed
 
-halLiftover --outPSL --noDupes ../../data/primates_eichler.hal \
-            Bonobo ${tmpBed} ${destOrg} ${tmpOutPsl}
+halLiftover --outPSL --noDupes ${hal} \
+            ${srcOrg} ${tmpBed} ${destOrg} ${tmpOutPsl}
 rm -f $tmpBed
 mv $tmpOutPsl $outPsl

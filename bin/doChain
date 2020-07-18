@@ -1,15 +1,22 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 set -beEu -o pipefail
 
-target=$1
-qGenome=../../data/genomes/Bonobo.2bit
-tGenome=../../data/genomes/$target.2bit 
+if [ $# != 2 ] ; then
+    echo "wrong # args" >&2
+    exit 1
+fi
 
-mkdir -p chained
-outChain=chained/Bonobo-$target.chain.gz
+srcOrg=$1
+destOrg=$2
+srcDest="${srcOrg}-${destOrg}"
+
+qGenome=../../data/genomes/$srcOrg.2bit
+tGenome=../../data/genomes/$destOrg.2bit 
+
+outChain=${srcDest}/${srcDest}.chain.gz
 outChainTmp=$outChain.$$.tmp
 
-pslPosTarget raw/Bonobo-$target.raw.psl stdout | \
+pslPosTarget ${srcDest}/${srcDest}.raw.psl stdout | \
     axtChain -psl -verbose=0 \
          -matrix=/scratch/data/blastz/human_chimp.v2.q -minScore=5000 -linearGap=medium \
          stdin $tGenome $qGenome stdout | \

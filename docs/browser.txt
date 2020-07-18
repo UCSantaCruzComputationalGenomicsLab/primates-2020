@@ -96,3 +96,40 @@ http://courtyard.gi.ucsc.edu/~markd/primates-2020/rhemac2-novel/
    for g in $(cat genomes.lst ) ; do (nice chainSwap chained/Bonobo-$g.chain.gz  chained/$g-Bonobo.chain&) ;done
 
 ================================================================================
+2020-06-25 build refseq bigBed
+cd build/Bonobo
+GCA_013052645.1
+
+    time (~/kent/src/hg/utils/automation/doNcbiRefSeq.pl -buildDir=$(pwd) \
+      -bigClusterHub=ku -dbHost=hgwdev -stop=process \
+      -fileServer=hgwdev -smallClusterHub=hgwdev -workhorse=hgwdev \
+      GCF_013052645.1_Mhudiblu_PPA_v0 panPan3)>&log&
+
+this didn't work
+
+hgsql -N panPan3 < refSeq.sql >ncbiRefSeq.gp
+
+--------------------------------------------------------------------------------
+SELECT 
+    g.name, g.chrom, g.strand, g.txStart, g.txEnd, g.cdsStart, g.cdsEnd,
+    g.exonCount, g.exonStarts, g.exonEnds, g.score, g.name2, g.cdsStartStat,
+    g.cdsEndStat, g.exonFrames,
+    m.gene_biotype, m.name, m.product
+FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
+================================================================================
+2020-07-17: create chains for Jason using new alignments, include human, chimp, bonobo
+    cd build/chains.tmp
+    ../../primates-2020/bin/makeChainJobs Bonobo Chimp Human
+    ../../primates-2020/bin/makeChainJobs Human Chimp
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para create $p/jobs.para -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para try $p/jobs.para -batch=$p/b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para check -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para push -batch=$p.b1 ; done
+
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
+
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (pf=$(echo $p |awk -F - '{print $1,$2}'); nice ../../primates-2020/bin/doChain $pf >&$p/chain.log&) ; done
+
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
+    mkdir ../chains-v2
+================================================================================

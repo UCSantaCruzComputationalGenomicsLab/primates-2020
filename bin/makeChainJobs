@@ -1,0 +1,27 @@
+#!/bin/bash -e
+set -beEu -o pipefail
+
+if [ $# -lt 2 ] ; then
+    echo "wrong # args srcGenome destGenome ..." >&2
+    exit 1
+fi
+
+binDir=$(dirname $(which $0))
+
+srcOrg=$1 ; shift
+destOrgs="$*"
+
+export PATH=/hive/users/markd/compartiveGenomics/projs/hal/src/hal-opt/bin:${PATH}
+hal=/hive/users/markd/compartiveGenomics/projs/primates-2020/data/primates_eichler-v2.hal
+
+
+for destOrg in $destOrgs ; do
+    srcDest="$srcOrg-$destOrg"
+    mkdir -p $srcDest
+    jobFile=$srcDest/jobs.para
+    seqsBed=$srcDest/$srcOrg.seqs.bed
+    halStats --bedSequences $srcOrg $hal >$seqsBed
+    awk -v srcOrg=${srcOrg} -v destOrg=${destOrg} -v srcDest=${srcDest} -v binDir=${binDir} \
+        '{print binDir "/doHalLiftOver", srcOrg, $1, $2, $3, destOrg, srcDest "/psls/" $1 ":" $2 "-" $3 ".psl"}'  $seqsBed >$jobFile
+
+done
