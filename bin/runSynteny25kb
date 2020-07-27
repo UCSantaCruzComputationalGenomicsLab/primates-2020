@@ -12,5 +12,5 @@ outPsl=$4
 tmpOutPsl=${outPsl}.$(hostname).$$.tmp
 mkdir -p $(dirname ${outPsl})
 
-../../../bin/halSynteny --minBlockSize 25000 --maxAnchorDistance 25000 --targetGenome ${target} --queryGenome ${query} --queryChromosome ${queryChrom} ../../../data/primates_eichler.hal ${tmpOutPsl}
+../../bin/halSynteny --minBlockSize 25000 --maxAnchorDistance 25000 --targetGenome ${target} --queryGenome ${query} --queryChromosome ${queryChrom} ../../data/primates_eichler.hal ${tmpOutPsl}
 mv -f ${tmpOutPsl} ${outPsl}

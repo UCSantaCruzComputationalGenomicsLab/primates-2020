@@ -43,3 +43,93 @@
   for o in $(cat targets.lst) ; do (cat out/$o.*.psl | pslSwap stdin stdout >$o-Rhesus.syn25mb.psl &) ; done
   for f in *.psl ; do (pslToBigPsl $f stdout  | sort -k1,1 -k2,2n >$(basename $f .psl).bigPslInput&) ; done  
   for f in *.bigPslInput ; do (ulimit -s 20000; bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../../data/Rhesus.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
+================================================================================
+# 2020-04-19 markd browser directory of filter novel exon set
+
+~markd/public_html/primates-2020/rhemac2-novel
+
+bedToHtmlDir -browser-url http://genome.ucsc.edu -title 'High-confidence unique Rhesus exons' -hub http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/trackHub/hub.txt rheMac10 notebooks/rhesus_filtered_novel_exons.bed ~/public_html/primates-2020/rhemac2-novel
+
+http://courtyard.gi.ucsc.edu/~markd/primates-2020/rhemac2-novel/
+================================================================================
+2020-05-17-18 markd Bonobo synteny track 25kb, 1mb, and 25mb resolutions
+
+  cd analysis/bonobo_synteny
+
+  # do alignments with Rhesus as query
+  fgrep -v Bonobo ../../data/leaf-genomes.lst >targets.lst
+  ../../bin/halStats --bedSequences Bonobo ../../data/primates_eichler.hal | cut -f 1 > Bonobo.seqs
+  ../../bin/halStats --chromSizes Bonobo ../../data/primates_eichler.hal > ../../data/Bonobo.chrom.sizes
+
+  desired command is:
+    ../../bin/halSynteny --minBlockSize 25000 --maxAnchorDistance 25000 --targetGenome ${TARGET} --queryGenome Rhesus --queryChromosome ${CHROM}  ../../../data/primates_eichler.hal out/${TARGET}.${CHROM}.psl
+  which is executed by runSynteny*
+  
+  create syn???.tmpl:
+    #LOOP
+    ../../primates-2020/bin/runSynteny?? Bonobo $(path2) $(path1) {check out exists tmp/???/$(path1).$(path2).psl}
+    #ENDLOOP
+  mkdir -p tmp/25kb tmp/1mb tmp/25mb
+  for r in 25kb 1mb 25mb ; do gensub2 targets.lst Bonobo.seqs syn$r.tmpl tmp/$r.jobs ; done
+
+  # run with -ram=16g
+  ssh ku
+  for r in 25kb 1mb 25mb ; do para push -batch=tmp/$r.batch tmp/$r.jobs -ram=16g  -maxQueue=100000000 ; done
+  for r in 25kb 1mb 25mb ; do para freeBatch  -batch=tmp/$r.batch ; done
+
+  # build bigPsls
+  # need to increase stack since in bedToBigBed do to very large PSLs
+  for r in 25kb 1mb 25mb ; do for o in $(cat targets.lst) ; do (cat tmp/${r}/$o.*.psl | pslSwap stdin stdout >$o-Bonobo.syn${r}.psl &) ; done ;done
+  for f in *.psl ; do (pslToBigPsl $f stdout  | bedSort stdin $(basename $f .psl).bigPslInput&) ; done  
+  for f in *.bigPslInput ; do (ulimit -s 20000; bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../data/Bonobo.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
+
+  # check
+  for f in *.bigPsl ; do bigBedInfo $f >/dev/null ; done
+================================================================================
+2020-06-08: liftover chains from HAL for bonobo
+   Bonobo to o
+   halStats --bedSequences Bonobo ../../data/primates_eichler.mmhal >Bonobo.seqs.bed0
+   for g in $(cat genomes.lst ) ; do awk -v g=$g '{print "./doHalLiftOver", $1,$2,$3,g, "tmp/"g"."$1".psl"}' Bonobo.seqs.bed ; done >tmp/jobs.para
+
+   for g in $(cat genomes.lst ) ; do (cat tmp/$g.* > raw/Bonobo-$g.raw.psl&) ; done
+   for g in $(cat genomes.lst ) ; do (nice ./doChain $g >&$g.log&) ;done
+   for g in $(cat genomes.lst ) ; do (nice chainSwap chained/Bonobo-$g.chain.gz  chained/$g-Bonobo.chain&) ;done
+
+================================================================================
+2020-06-25 build refseq bigBed
+cd build/Bonobo
+GCA_013052645.1
+
+    time (~/kent/src/hg/utils/automation/doNcbiRefSeq.pl -buildDir=$(pwd) \
+      -bigClusterHub=ku -dbHost=hgwdev -stop=process \
+      -fileServer=hgwdev -smallClusterHub=hgwdev -workhorse=hgwdev \
+      GCF_013052645.1_Mhudiblu_PPA_v0 panPan3)>&log&
+
+this didn't work
+
+hgsql -N panPan3 < refSeq.sql >ncbiRefSeq.gp
+
+--------------------------------------------------------------------------------
+SELECT 
+    g.name, g.chrom, g.strand, g.txStart, g.txEnd, g.cdsStart, g.cdsEnd,
+    g.exonCount, g.exonStarts, g.exonEnds, g.score, g.name2, g.cdsStartStat,
+    g.cdsEndStat, g.exonFrames,
+    m.gene_biotype, m.name, m.product
+FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
+================================================================================
+2020-07-17: create chains for Jason using new alignments, include human, chimp, bonobo
+    cd build/chains.tmp
+    ../../primates-2020/bin/makeChainJobs Bonobo Chimp Human
+    ../../primates-2020/bin/makeChainJobs Human Chimp
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para create $p/jobs.para -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para try $p/jobs.para -batch=$p/b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para check -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para push -batch=$p.b1 ; done
+
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
+
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (pf=$(echo $p |awk -F - '{print $1,$2}'); nice ../../primates-2020/bin/doChain $pf >&$p/chain.log&) ; done
+
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
+    mkdir ../chains-v2
+================================================================================

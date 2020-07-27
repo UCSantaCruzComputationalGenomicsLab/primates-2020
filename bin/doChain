@@ -1,0 +1,26 @@
+#!/bin/bash -e
+set -beEu -o pipefail
+
+if [ $# != 2 ] ; then
+    echo "wrong # args" >&2
+    exit 1
+fi
+
+srcOrg=$1
+destOrg=$2
+srcDest="${srcOrg}-${destOrg}"
+
+qGenome=../../data/genomes/$srcOrg.2bit
+tGenome=../../data/genomes/$destOrg.2bit 
+
+outChain=${srcDest}/${srcDest}.chain.gz
+outChainTmp=$outChain.$$.tmp
+
+pslPosTarget ${srcDest}/${srcDest}.raw.psl stdout | \
+    axtChain -psl -verbose=0 \
+         -matrix=/scratch/data/blastz/human_chimp.v2.q -minScore=5000 -linearGap=medium \
+         stdin $tGenome $qGenome stdout | \
+    chainAntiRepeat  $tGenome $qGenome stdin stdout | \
+    gzip -c >$outChainTmp
+
+mv -f $outChainTmp $outChain
