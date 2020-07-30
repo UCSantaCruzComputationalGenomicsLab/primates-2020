@@ -121,10 +121,10 @@ FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
     cd build/chains.tmp
     ../../primates-2020/bin/makeChainJobs Bonobo Chimp Human
     ../../primates-2020/bin/makeChainJobs Human Chimp
-    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para create $p/jobs.para -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para create $p/jobs.para -batch=$p/b1 ; done
     for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para try $p/jobs.para -batch=$p/b1 ; done
-    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para check -batch=$p.b1 ; done
-    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para push -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para check -batch=$p/b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para push -batch=$p/b1 ; done
 
     for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
 
@@ -132,4 +132,41 @@ FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
 
     for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
     mkdir ../chains-v2
+
+
+2020-07-21
+    add Bonobo-Orangutan Bonobo-Gorilla
+    ../../primates-2020/bin/makeChainJobs Bonobo Orangutan Gorilla
+    pairs="Bonobo-Orangutan Bonobo-Gorilla"
+    for p in ${pairs} ; do para create $p/jobs.para -batch=$p/b1 ; done
+    for p in ${pairs} ; do para try $p/jobs.para -batch=$p/b1 ; done
+    for p in ${pairs} ; do para check -batch=$p/b1 ; done
+    for p in ${pairs} ; do para push -batch=$p/b1 ; done
+
+    for p in ${pairs} ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
+
+    for p in ${pairs} ; do (pf=$(echo $p |awk -F - '{print $1,$2}'); nice ../../primates-2020/bin/doChain $pf >&$p/chain.log&) ; done
+
+    for p in ${pairs} ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
+
+2020-07-29
+ gorilla, chimp, human: combos
+    ../../primates-2020/bin/makeChainJobs Gorilla Chimp Human Bonobo Orangutan
+    pairs="Gorilla-Chimp Gorilla-Human Gorilla-Bonobo Gorilla-Orangutan"
+    for p in ${pairs} ; do para create $p/jobs.para -batch=$p/b1 ; done
+    for p in ${pairs} ; do para push -batch=$p/b1 ; done
+    for p in ${pairs} ; do para check -batch=$p/b1 ; done
+    # hgwdev
+    for p in ${pairs} ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
+    for p in ${pairs} ; do (pf=$(echo $p |awk -F - '{print $1,$2}'); nice ../../primates-2020/bin/doChain $pf >&$p/chain.log&) ; done
+    for p in ${pairs} ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
+
+    # add some Orangutan as well
+    ../../primates-2020/bin/makeChainJobs Orangutan Chimp Human
+    pairs=*-*
+
+    
+
+    rsync -a chains-v2/  $courtyard:/public/groups/cgl/cat/primates_evan/v2/out/assemblyHub/liftOver/
+
 ================================================================================
