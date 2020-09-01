@@ -24,13 +24,17 @@ Drawing of [phylogenetic tree](cactus.icytree.png)
 # Location of various stuff:
   * Ian's cactus and CAT work: /public/groups/cgl/cat/primates_evan/
   * Ian's hub: /public/groups/cgl/cat/primates_evan/out/assemblyHub
+           /public/home/jcarmstr/public_html/cat_data/primates_evan/v2/out/assemblyHub
   * Shwetha's hub
     https://eichlerlab.gs.washington.edu/public/primates_hub/assemblyHub/hub.txt
   * HAL:  /public/groups/cgl/cat/primates_evan/primates_eichler.hal 
           /public/groups/cgl/cat/primates_evan/primates_eichler-v2.hal
-  * URL of Ian's hub:  http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/assemblyHub/hub.txt
-    http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/v2/bonobo-only-v2.1/assemblyHub/hub.txt
-  * URL of Track hub for native browser genomes:  http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/trackHub/hub.txt
+  * URL of Ian's hubs:  
+           http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/assemblyHub/hub.txt
+           http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/v2/out/assemblyHub/hub.txt
+           http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/v2/bonobo-only-v2.1/assemblyHub/hub.txt
+  * URL of Track hub for native browser genomes:  
+          http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/out/trackHub/hub.txt
   * analysis shared directory:
     * /public/groups/cgl/projs/primates-2020
     
