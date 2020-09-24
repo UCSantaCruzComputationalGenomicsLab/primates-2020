@@ -204,5 +204,5 @@ FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
 
   # check
   for f in *.bigPsl ; do bigBedInfo $f >/dev/null ; done
-  rsync *.bigPsl $courtyard:/public/groups/cgl/cat/primates_evan/v2/out/assemblyHub/Marmoset:
+  rsync *.bigPsl $courtyard:/public/groups/cgl/cat/primates_evan/v2/out/assemblyHub/Marmoset/synteny/
 =================================================================================
