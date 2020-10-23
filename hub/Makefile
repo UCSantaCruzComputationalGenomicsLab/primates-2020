@@ -1,6 +1,7 @@
+hubUrl = http://courtyard.gi.ucsc.edu/~jcarmstr/cat_data/primates_evan/v2/out/assemblyHub/hub.txt
 
 ifeq ($(shell hostname -f), courtyard.gi.ucsc.edu)
-   hubRootDir = /public/groups/cgl/cat/primates_evan/out
+   hubRootDir = /public/groups/cgl/cat/primates_evan/v2/out
    contact = markd@ucsc.edu
 else
    hubRootDir = $(error Shwetha set this)
@@ -16,6 +17,7 @@ all: buildAssemblyHub buildTrackHub
 # assembly hub
 ##
 buildAssemblyHub: ${txtFiles:%=${asmHubDir}/%} ${asmHubDir}/hub.txt
+	hubCheck ${hubUrl}
 
 ${asmHubDir}/%: %
 	cp -f $< $@

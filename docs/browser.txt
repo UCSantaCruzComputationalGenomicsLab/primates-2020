@@ -121,10 +121,10 @@ FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
     cd build/chains.tmp
     ../../primates-2020/bin/makeChainJobs Bonobo Chimp Human
     ../../primates-2020/bin/makeChainJobs Human Chimp
-    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para create $p/jobs.para -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para create $p/jobs.para -batch=$p/b1 ; done
     for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para try $p/jobs.para -batch=$p/b1 ; done
-    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para check -batch=$p.b1 ; done
-    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para push -batch=$p.b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para check -batch=$p/b1 ; done
+    for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do para push -batch=$p/b1 ; done
 
     for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
 
@@ -132,4 +132,77 @@ FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
 
     for p in Bonobo-Chimp Bonobo-Human Human-Chimp ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
     mkdir ../chains-v2
+
+
+2020-07-21
+    add Bonobo-Orangutan Bonobo-Gorilla
+    ../../primates-2020/bin/makeChainJobs Bonobo Orangutan Gorilla
+    pairs="Bonobo-Orangutan Bonobo-Gorilla"
+    for p in ${pairs} ; do para create $p/jobs.para -batch=$p/b1 ; done
+    for p in ${pairs} ; do para try $p/jobs.para -batch=$p/b1 ; done
+    for p in ${pairs} ; do para check -batch=$p/b1 ; done
+    for p in ${pairs} ; do para push -batch=$p/b1 ; done
+
+    for p in ${pairs} ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
+
+    for p in ${pairs} ; do (pf=$(echo $p |awk -F - '{print $1,$2}'); nice ../../primates-2020/bin/doChain $pf >&$p/chain.log&) ; done
+
+    for p in ${pairs} ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
+
+2020-07-29
+ gorilla, chimp, human: combos
+    ../../primates-2020/bin/makeChainJobs Gorilla Chimp Human Bonobo Orangutan
+    pairs="Gorilla-Chimp Gorilla-Human Gorilla-Bonobo Gorilla-Orangutan"
+    for p in ${pairs} ; do para create $p/jobs.para -batch=$p/b1 ; done
+    for p in ${pairs} ; do para push -batch=$p/b1 ; done
+    for p in ${pairs} ; do para check -batch=$p/b1 ; done
+    # hgwdev
+    for p in ${pairs} ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
+    for p in ${pairs} ; do (pf=$(echo $p |awk -F - '{print $1,$2}'); nice ../../primates-2020/bin/doChain $pf >&$p/chain.log&) ; done
+    for p in ${pairs} ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
+
+    # add some Orangutan as well
+    ../../primates-2020/bin/makeChainJobs Orangutan Chimp Human
+    pairs=*-*
+
+    
+
+    rsync -a chains-v2/  $courtyard:/public/groups/cgl/cat/primates_evan/v2/out/assemblyHub/liftOver/
+
 ================================================================================
+2020-09-22 markd Marmoset synteny track 25kb, 1mb, 25mb resolutions
+  cd analysis/marmoset_synteny
+
+  # do alignments with Rhesus as query
+  fgrep -v Marmoset ../../data/leaf-genomes.lst >targets.lst
+  ../../bin/halStats --bedSequences Marmoset ../../data/primates_eichler.hal | cut -f 1 > Marmoset.seqs
+  ../../bin/halStats --chromSizes Marmoset ../../data/primates_eichler.hal > ../../data/Marmoset.chrom.sizes
+
+  desired command is:
+    ../../bin/halSynteny --minBlockSize 25000 --maxAnchorDistance 25000 --targetGenome ${TARGET} --queryGenome Rhesus --queryChromosome ${CHROM}  ../../../data/primates_eichler.hal out/${TARGET}.${CHROM}.psl
+  which is executed by runSynteny*
+  
+  create syn???.tmpl:
+    #LOOP
+    ../../primates-2020/bin/runSynteny1mb Marmoset $(path2) $(path1) {check out exists tmp/1mb/$(path1).$(path2).psl}
+    ../../primates-2020/bin/runSynteny25mb Marmoset $(path2) $(path1) {check out exists tmp/25mb/$(path1).$(path2).psl}
+    ../../primates-2020/bin/runSynteny25kb Marmoset $(path2) $(path1) {check out exists tmp/25kb/$(path1).$(path2).psl}
+    #ENDLOOP
+  mkdir -p tmp/25kb tmp/1mb tmp/25mb
+  gensub2 targets.lst Marmoset.seqs syn.tmpl tmp/para.jobs
+
+  # run with -ram=16g
+  ssh ku
+  for r in 25kb 1mb 25mb ; do para push -batch=tmp/$r.batch tmp/$r.jobs -ram=16g  -maxQueue=100000000 ; done
+  for r in 25kb 1mb 25mb ; do para freeBatch  -batch=tmp/$r.batch ; done
+
+  # build bigPsls
+  # need to increase stack since in bedToBigBed do to very large PSLs
+  for r in 25kb 1mb 25mb ; do for o in $(cat targets.lst) ; do (cat tmp/${r}/$o.*.psl | pslSwap stdin stdout >$o-Marmoset.syn${r}.psl &) ; done ;done
+  for f in *.psl ; do (pslToBigPsl $f stdout  | bedSort stdin $(basename $f .psl).bigPslInput&) ; done  
+  for f in *.bigPslInput ; do (ulimit -s 20000; bedToBigBed -type=bed12+13 -tab -as=${HOME}/kent/src/hg/lib/bigPsl.as $f ../../data/Marmoset.chrom.sizes $(basename $f .bigPslInput).bigPsl&) ; done
+
+  # check
+  for f in *.bigPsl ; do bigBedInfo $f >/dev/null ; done
+  rsync *.bigPsl $courtyard:/public/groups/cgl/cat/primates_evan/v2/out/assemblyHub/Marmoset/synteny/
+=================================================================================
