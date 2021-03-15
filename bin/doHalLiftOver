@@ -23,7 +23,7 @@ mkdir -p $(dirname $outPsl)
 
 echo -e "${chrom}\t${start}\t${end}" >$tmpBed
 
-halLiftover --outPSL --noDupes ${hal} \
+halLiftover --outPSL ${hal} \
             ${srcOrg} ${tmpBed} ${destOrg} ${tmpOutPsl}
 rm -f $tmpBed
 mv $tmpOutPsl $outPsl

@@ -10,8 +10,8 @@ srcOrg=$1
 destOrg=$2
 srcDest="${srcOrg}-${destOrg}"
 
-qGenome=../../data/genomes/$srcOrg.2bit
-tGenome=../../data/genomes/$destOrg.2bit 
+qGenome=../../../data/genomes/$srcOrg.2bit
+tGenome=../../../data/genomes/$destOrg.2bit 
 
 outChain=${srcDest}/${srcDest}.chain.gz
 outChainTmp=$outChain.$$.tmp

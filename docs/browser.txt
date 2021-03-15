@@ -206,3 +206,24 @@ FROM ncbiRefSeq g, ncbiRefSeqLink m WHERE g.name=m.id;
   for f in *.bigPsl ; do bigBedInfo $f >/dev/null ; done
   rsync *.bigPsl $courtyard:/public/groups/cgl/cat/primates_evan/v2/out/assemblyHub/Marmoset/synteny/
 =================================================================================
+2020-09-24: liftover chains from HAL for  Marmoset
+================================================================================
+
+    cd build/chains-v2/tmp/
+    targets="Human Chimp Bonobo Gorilla Orangutan Gibbon Rhesus"
+    ../../../primates-2020/bin/makeChainJobs Marmoset $targets
+
+    pairs=*-*
+
+    ssk ku
+    for p in ${pairs} ; do para create $p/jobs.para -batch=$p/b1 ; done
+    for p in ${pairs} ; do para push -batch=$p/b1 ; done
+    for p in ${pairs} ; do para check -batch=$p/b1 ; done
+
+    ssh hgwdev
+    for p in ${pairs} ; do (find $p/psls -name '*.psl' |xargs cat > $p/$p.raw.psl&)  ; done
+
+    for p in ${pairs} ; do (pf=$(echo $p |awk -F - '{print $1,$2}'); nice ../../../primates-2020/bin/doChain $pf >&$p/chain.log&) ; done
+
+    for p in ${pairs} ; do (rev=$(echo $p |awk -F - '{print $2"-"$1}'); nice chainSwap $p/$p.chain.gz stdout | gzip -c >$p/$rev.chain.gz&) ; done
+================================================================================

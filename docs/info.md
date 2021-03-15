@@ -40,3 +40,5 @@ Drawing of [phylogenetic tree](cactus.icytree.png)
     
   * dN/dS data: /public/groups/cgl/cat/primates_evan/dn_ds.csv
 
+  * new hub for wetlab
+   /public/groups/cgl/cat/primates_jason/REDO/cat/gencode_v33/out/assemblyHub/hub.txt 
